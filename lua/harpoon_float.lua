@@ -40,7 +40,7 @@ function HarpoonFloat:register_autocmds()
     group = vim.api.nvim_create_augroup('HarpoonFloatRedraw', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
-        self:Close()
+        self:close()
       end
     end,
   })
@@ -52,7 +52,7 @@ function HarpoonFloat:register_autocmds()
     group = vim.api.nvim_create_augroup('HarpoonFloatCloseWithAnchoringWindow', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
-        self:Close()
+        self:close()
       end
     end,
   })
@@ -63,7 +63,7 @@ function HarpoonFloat:register_autocmds()
     group = vim.api.nvim_create_augroup('HarpoonFloatCloseWithVim', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
-        self:Close()
+        self:close()
       end
     end,
   })
@@ -85,7 +85,7 @@ function HarpoonFloat:create_buffer_if_not_exists()
   end)
 end
 
-function HarpoonFloat:update_buffer_lines()
+function HarpoonFloat:set_buffer_lines()
   self:create_buffer_if_not_exists()
 
   local display = list:display()
@@ -136,18 +136,18 @@ end
 
 function HarpoonFloat:draw()
   vim.schedule(function()
-    self:update_buffer_lines()
-    self:update_window_config()
+    self:set_buffer_lines()
+    self:set_window_config()
   end)
 end
 
-function HarpoonFloat:update_window_config()
+function HarpoonFloat:set_window_config()
   self:create_window_if_not_exists()
   vim.api.nvim_win_set_config(self.winnr, self:get_window_config())
 end
 
 -- Closes the window and deletes the associated buffer
-function HarpoonFloat:Close()
+function HarpoonFloat:close()
   if vim.api.nvim_win_is_valid(self.winnr) then
     vim.api.nvim_win_close(self.winnr, true)
   end
