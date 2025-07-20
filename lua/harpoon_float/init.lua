@@ -162,4 +162,4 @@ function HarpoonFloat:setup()
   float:draw()
 end
 
-return float
+return HarpoonFloat
