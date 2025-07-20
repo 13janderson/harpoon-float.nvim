@@ -157,9 +157,11 @@ function HarpoonFloat:close()
 end
 
 function HarpoonFloat:setup()
-  -- Draw on being loaded
-  local float = self:new()
-  float:draw()
+  vim.schedule(function()
+    -- Draw on being loaded
+    local float = self:new()
+    float:draw()
+  end)
 end
 
 return HarpoonFloat
