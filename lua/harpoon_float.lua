@@ -15,7 +15,6 @@ function HarpoonFloat:new()
     group = vim.api.nvim_create_augroup('HarpoonFloatRedraw', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == instance.anchor_winnr then
-        print("Redrawing window")
         instance:redraw()
       end
     end,
@@ -35,7 +34,6 @@ end
 
 function HarpoonFloat:create_buffer_if_not_exists()
   if self.bufnr == nil then
-    print "creating buf"
     self.bufnr = vim.api.nvim_create_buf(true, false)
   end
 
@@ -70,8 +68,7 @@ function HarpoonFloat:update_buffer_lines()
       self.max_harpoon_entry_len = len
     end
   end
-  print(self.bufnr)
-  vim.api.nvim_buf_set_lines(self.bufnr, -1, -1, false, self.harpoon_lines)
+  vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, self.harpoon_lines)
 end
 
 ---@return vim.api.keyset.win_config config
@@ -85,8 +82,8 @@ function HarpoonFloat:get_window_config()
     relative = "win",
     width = 39,
     height = #self.harpoon_lines,
-    row = -1.4 * win_height,
-    col = win_width * -1.7,
+    row = 0.4 * win_height,
+    col = win_width * 0.7,
     style = "minimal",
     border = "rounded",
   }
@@ -120,11 +117,7 @@ function HarpoonFloat:Close()
   vim.defer_fn(function()
     vim.api.nvim_win_close(self.winnr, true)
     vim.api.nvim_buf_delete(self.bufnr, { force = true })
-  end, 14999)
+  end, 15000)
 end
-
-local float = HarpoonFloat:new()
-float:update_buffer_lines()
-float:create_window()
 
 return HarpoonFloat
