@@ -44,6 +44,7 @@ function HarpoonFloat:register_autocmds()
     group = vim.api.nvim_create_augroup('HarpoonFloatRedrawOnResize', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
+        print "RESIZING"
         self:draw()
       end
     end,
@@ -102,7 +103,7 @@ function HarpoonFloat:get_window_config()
   local win_width = vim.api.nvim_win_get_width(self.anchor_winnr)
   local win_height = vim.api.nvim_win_get_height(self.anchor_winnr)
 
-  return {
+  local config = {
     title = "HarpoonFloat",
     title_pos = "left",
     win = self.anchor_winnr,
@@ -114,14 +115,20 @@ function HarpoonFloat:get_window_config()
     style = "minimal",
     border = "rounded",
   }
+  print(string.format("anchor_winnr: %d, win_width: %d, win_height: %d, row: %f, col: %f",
+    self.anchor_winnr, win_width, win_height, config.row, config.col))
+
+  return config
 end
 
+-- Sets the window config, creating the window if needed first.
 function HarpoonFloat:create_window_if_not_exists()
+  local config = self:get_window_config()
   if self.winnr ~= nil and vim.api.nvim_win_is_valid(self.winnr) then
-    return
+    vim.api.nvim_win_set_config(self.winnr, config)
   end
 
-  self.winnr = vim.api.nvim_open_win(self.bufnr, false, self:get_window_config())
+  self.winnr = vim.api.nvim_open_win(self.bufnr, false, config)
 end
 
 function HarpoonFloat:draw()
