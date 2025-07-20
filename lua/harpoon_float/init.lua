@@ -7,7 +7,6 @@ function HarpoonFloat:new()
   self.__index = self
 
   local instance = setmetatable({}, self)
-  instance:create_buffer_if_not_exists()
   instance.anchor_winnr = vim.api.nvim_get_current_win()
   instance:register_autocmds()
 
@@ -19,14 +18,16 @@ function HarpoonFloat:new()
       instance:draw()
     end
   })
+
   return instance
 end
 
 function HarpoonFloat:register_autocmds()
   -- Resize the floating window on the anchoring window being resized
   vim.api.nvim_create_autocmd('WinResized', {
+    pattern = { "*" },
     desc = 'Redraw harpoon overlay on resize',
-    group = vim.api.nvim_create_augroup('HarpoonFloatRedraw', { clear = true }),
+    group = vim.api.nvim_create_augroup('HarpoonFloatRedrawOnResize', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
         self:draw()
@@ -36,20 +37,9 @@ function HarpoonFloat:register_autocmds()
 
   -- Close the window and delete the buffer on the anchoring window being closed
   vim.api.nvim_create_autocmd('WinClosed', {
+    pattern = ".*",
     desc = 'Close harpoon overlay on anchoring window being closed',
-    group = vim.api.nvim_create_augroup('HarpoonFloatRedraw', { clear = true }),
-    callback = function(e)
-      if tonumber(e.match) == self.anchor_winnr then
-        self:close()
-      end
-    end,
-  })
-
-
-  -- Close the window and delete the buffer on the anchoring window being closed
-  vim.api.nvim_create_autocmd('WinClosed', {
-    desc = 'Close harpoon overlay on anchoring window being closed',
-    group = vim.api.nvim_create_augroup('HarpoonFloatCloseWithAnchoringWindow', { clear = true }),
+    group = vim.api.nvim_create_augroup('HarpoonFloatRedrawOnClose', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
         self:close()
@@ -59,6 +49,7 @@ function HarpoonFloat:register_autocmds()
 
   -- Close the window and delete the buffer on leaving vim
   vim.api.nvim_create_autocmd('VimLeave', {
+    pattern = ".*",
     desc = 'Close harpoon overlay on leaving vim',
     group = vim.api.nvim_create_augroup('HarpoonFloatCloseWithVim', { clear = true }),
     callback = function(e)
@@ -163,6 +154,5 @@ function HarpoonFloat:setup()
     float:draw()
   end)
 end
-
 
 return HarpoonFloat
