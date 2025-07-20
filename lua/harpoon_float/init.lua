@@ -19,6 +19,19 @@ function HarpoonFloat:new()
     end,
     UI_CREATE = function()
       instance:hide()
+      vim.api.nvim_create_autocmd('WinClosed', {
+        desc = "Redraw harpoon overlay on harpoon's own window being closed",
+        group = vim.api.nvim_create_augroup('HarpoonFloatRedrawWithHarpoonWinClose', { clear = true }),
+        callback = function(e)
+          vim.schedule(function()
+            if tonumber(e.match) == harpoon.ui.win_id then
+              print "redrawing due to harpoon"
+              self:draw()
+            end
+          end)
+        end,
+        once = true
+      })
     end
   })
 
@@ -55,7 +68,7 @@ function HarpoonFloat:create_buffer_if_not_exists()
 end
 
 -- Sets the buffer lines, creating the buffer if needed first.
-function HarpoonFloat:upsert_buffer_lines()
+function HarpoonFloat:set_buffer_lines()
   self:create_buffer_if_not_exists()
 
   local display = list:display()
@@ -81,8 +94,10 @@ end
 
 ---@return vim.api.keyset.win_config config
 function HarpoonFloat:get_window_config()
+  print("anchor_winnr", self.anchor_winnr)
   local win_width = vim.api.nvim_win_get_width(self.anchor_winnr)
   local win_height = vim.api.nvim_win_get_height(self.anchor_winnr)
+
   return {
     title = "HarpoonFloat",
     title_pos = "left",
@@ -107,15 +122,16 @@ end
 
 function HarpoonFloat:draw()
   vim.schedule(function()
-    self:upsert_buffer_lines()
-    self:upsert_window_config()
+    -- Only draw if there is a single non-floating window open.
+    -- Exlcuding our own window as a precaution
+    local open_wins = vim.tbl_filter(function(v)
+      return v == self.winnr or vim.api.nvim_win_get_config(v).relative == ''
+    end, vim.api.nvim_list_wins())
+    if #open_wins == 1 then
+      self:set_buffer_lines()
+      self:create_window_if_not_exists()
+    end
   end)
-end
-
--- Sets the window config, creating the window if needed first.
-function HarpoonFloat:upsert_window_config()
-  self:create_window_if_not_exists()
-  vim.api.nvim_win_set_config(self.winnr, self:get_window_config())
 end
 
 -- Closes the window and deletes the associated buffer
@@ -141,5 +157,7 @@ function HarpoonFloat:setup()
     float:draw()
   end)
 end
+
+HarpoonFloat:setup()
 
 return HarpoonFloat
