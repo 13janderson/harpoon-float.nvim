@@ -64,23 +64,6 @@ function HarpoonFloat:create_buffer_if_not_exists()
   if self.bufnr == nil or not vim.api.nvim_buf_is_valid(self.bufnr) then
     self.bufnr = vim.api.nvim_create_buf(false, true)
   end
-  print(self.bufnr)
-
-  local augroup = vim.api.nvim_create_augroup('HarpoonFloatBufferOptions', { clear = true })
-  vim.api.nvim_create_autocmd('BufWinEnter', {
-    desc = 'Apply buffer options upon the window entering the buffer',
-    group = augroup,
-    callback = function(e)
-      if e.buf == self.bufnr then
-        vim.api.nvim_del_augroup_by_id(augroup)
-        vim.schedule(function()
-          print "Setting buffer options"
-          vim.api.nvim_set_option_value("relativenumber", false, { win = self.winnr })
-          vim.api.nvim_set_option_value("number", true, { win = self.winnr })
-        end)
-      end
-    end,
-  })
 end
 
 -- Sets the buffer lines, creating the buffer if needed first.
@@ -136,6 +119,8 @@ function HarpoonFloat:create_window_if_not_exists()
   end
 
   self.winnr = vim.api.nvim_open_win(self.bufnr, false, config)
+  vim.wo[self.winnr].number = true
+  vim.wo[self.winnr].relativenumber = false
 end
 
 function HarpoonFloat:draw()
@@ -176,5 +161,7 @@ function HarpoonFloat:setup()
     float:draw()
   end)
 end
+
+HarpoonFloat:setup()
 
 return HarpoonFloat
