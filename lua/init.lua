@@ -157,6 +157,7 @@ function HarpoonFloat:close()
 end
 
 function HarpoonFloat:setup()
+  print "setup called"
   vim.schedule(function()
     -- Draw on being loaded
     local float = self:new()
