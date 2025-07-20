@@ -36,19 +36,22 @@ function HarpoonFloat:new()
     end
   })
   return instance
-
 end
 
 function HarpoonFloat:create_buffer_if_not_exists()
   if self.bufnr == nil then
+    print "creating buf"
     self.bufnr = vim.api.nvim_create_buf(true, false)
   end
 
   -- Event loop I guess?
   vim.schedule(function()
-    ---@diagnostic disable-next-line
-    vim.api.nvim_buf_set_option(self.bufnr, "relativenumber", false)
-    vim.api.nvim_buf_set_option(self.bufnr, "number", true)
+    if vim.api.nvim_buf_is_valid(self.bufnr) then
+      ---@diagnostic disable-next-line
+      vim.api.nvim_buf_set_option(self.bufnr, "relativenumber", false)
+      ---@diagnostic disable-next-line
+      vim.api.nvim_buf_set_option(self.bufnr, "number", true)
+    end
   end)
 end
 
@@ -72,6 +75,7 @@ function HarpoonFloat:update_buffer_lines()
       self.max_harpoon_entry_len = len
     end
   end
+  print(self.bufnr)
   vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, self.harpoon_lines)
 end
 
@@ -99,7 +103,6 @@ function HarpoonFloat:create_window()
   end
 
   self.winnr = vim.api.nvim_open_win(self.bufnr, false, self:get_window_config())
-  print(self.winnr)
 end
 
 function HarpoonFloat:redraw()
@@ -124,8 +127,6 @@ function HarpoonFloat:Close()
     vim.api.nvim_buf_delete(self.bufnr, { force = true })
   end, 15000)
 end
-
---TODO: Handle re-sizing via autocmds
 
 local float = HarpoonFloat:new()
 float:update_buffer_lines()
