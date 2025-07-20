@@ -64,6 +64,7 @@ function HarpoonFloat:create_buffer_if_not_exists()
   if self.bufnr == nil or not vim.api.nvim_buf_is_valid(self.bufnr) then
     self.bufnr = vim.api.nvim_create_buf(false, true)
   end
+
 end
 
 -- Sets the buffer lines, creating the buffer if needed first.
