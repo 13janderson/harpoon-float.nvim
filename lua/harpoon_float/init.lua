@@ -25,7 +25,6 @@ end
 function HarpoonFloat:register_autocmds()
   -- Resize the floating window on the anchoring window being resized
   vim.api.nvim_create_autocmd('WinResized', {
-    pattern = { "*" },
     desc = 'Redraw harpoon overlay on resize',
     group = vim.api.nvim_create_augroup('HarpoonFloatRedrawOnResize', { clear = true }),
     callback = function(e)
@@ -35,34 +34,11 @@ function HarpoonFloat:register_autocmds()
     end,
   })
 
-  -- Close the window and delete the buffer on the anchoring window being closed
-  vim.api.nvim_create_autocmd('WinClosed', {
-    pattern = ".*",
-    desc = 'Close harpoon overlay on anchoring window being closed',
-    group = vim.api.nvim_create_augroup('HarpoonFloatRedrawOnClose', { clear = true }),
-    callback = function(e)
-      if tonumber(e.match) == self.anchor_winnr then
-        self:close()
-      end
-    end,
-  })
-
-  -- Close the window and delete the buffer on leaving vim
-  vim.api.nvim_create_autocmd('VimLeave', {
-    pattern = ".*",
-    desc = 'Close harpoon overlay on leaving vim',
-    group = vim.api.nvim_create_augroup('HarpoonFloatCloseWithVim', { clear = true }),
-    callback = function(e)
-      if tonumber(e.match) == self.anchor_winnr then
-        self:close()
-      end
-    end,
-  })
 end
 
 function HarpoonFloat:create_buffer_if_not_exists()
   if self.bufnr == nil then
-    self.bufnr = vim.api.nvim_create_buf(true, false)
+    self.bufnr = vim.api.nvim_create_buf(false, true)
   end
 
   -- Event loop I guess?
@@ -109,7 +85,7 @@ function HarpoonFloat:get_window_config()
     win = self.anchor_winnr,
     relative = "win",
     width = 40,
-    height = #self.harpoon_lines,
+    height = math.max(1, #self.harpoon_lines),
     row = 0.4 * win_height,
     col = win_width * 0.7,
     style = "minimal",
