@@ -104,8 +104,8 @@ function HarpoonFloat:set_buffer_lines()
     end
   end
 
-  vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, self.harpoon_lines)
   vim.schedule(function()
+    vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, self.harpoon_lines)
     vim.api.nvim_set_option_value("relativenumber", false, { win = self.winnr })
     vim.api.nvim_set_option_value("number", true, { win = self.winnr })
   end)
