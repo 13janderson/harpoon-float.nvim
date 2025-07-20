@@ -163,6 +163,4 @@ function HarpoonFloat:setup()
   end)
 end
 
-HarpoonFloat:setup()
-
 return HarpoonFloat
