@@ -74,6 +74,7 @@ function HarpoonFloat:create_buffer_if_not_exists()
       if e.buf == self.bufnr then
         vim.api.nvim_del_augroup_by_id(augroup)
         vim.schedule(function()
+          print "Setting buffer options"
           vim.api.nvim_set_option_value("relativenumber", false, { win = self.winnr })
           vim.api.nvim_set_option_value("number", true, { win = self.winnr })
         end)
@@ -175,7 +176,5 @@ function HarpoonFloat:setup()
     float:draw()
   end)
 end
-
-HarpoonFloat:setup()
 
 return HarpoonFloat
