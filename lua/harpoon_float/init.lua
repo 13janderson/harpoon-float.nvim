@@ -33,7 +33,6 @@ function HarpoonFloat:register_autocmds()
       end
     end,
   })
-
 end
 
 function HarpoonFloat:create_buffer_if_not_exists()
@@ -52,7 +51,8 @@ function HarpoonFloat:create_buffer_if_not_exists()
   end)
 end
 
-function HarpoonFloat:set_buffer_lines()
+-- Sets the buffer lines, creating the buffer if needed first.
+function HarpoonFloat:upsert_buffer_lines()
   self:create_buffer_if_not_exists()
 
   local display = list:display()
@@ -72,6 +72,7 @@ function HarpoonFloat:set_buffer_lines()
       self.max_harpoon_entry_len = len
     end
   end
+
   vim.api.nvim_buf_set_lines(self.bufnr, 0, -1, false, self.harpoon_lines)
 end
 
@@ -103,12 +104,13 @@ end
 
 function HarpoonFloat:draw()
   vim.schedule(function()
-    self:set_buffer_lines()
-    self:set_window_config()
+    self:upsert_buffer_lines()
+    self:upsert_window_config()
   end)
 end
 
-function HarpoonFloat:set_window_config()
+-- Sets the window config, creating the window if needed first.
+function HarpoonFloat:upsert_window_config()
   self:create_window_if_not_exists()
   vim.api.nvim_win_set_config(self.winnr, self:get_window_config())
 end
