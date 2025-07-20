@@ -25,7 +25,6 @@ function HarpoonFloat:new()
         callback = function(e)
           vim.schedule(function()
             if tonumber(e.match) == harpoon.ui.win_id then
-              print "redrawing due to harpoon"
               self:draw()
             end
           end)
@@ -49,21 +48,27 @@ function HarpoonFloat:register_autocmds()
       end
     end,
   })
+
+  vim.api.nvim_create_autocmd('WinNew', {
+    desc = 'Redraw harpoon overlay on resize',
+    group = vim.api.nvim_create_augroup('HarpoonFloatHideWithNewWindow', { clear = true }),
+    callback = function(e)
+      if tonumber(e.match) ~= self.winnr then
+        self:hide()
+      end
+    end,
+  })
 end
 
 function HarpoonFloat:create_buffer_if_not_exists()
-  if self.bufnr == nil then
+  if self.bufnr == nil or not vim.api.nvim_buf_is_valid(self.bufnr) then
     self.bufnr = vim.api.nvim_create_buf(false, true)
   end
-
-  -- Event loop I guess?
   vim.schedule(function()
-    if vim.api.nvim_buf_is_valid(self.bufnr) then
-      ---@diagnostic disable-next-line
-      vim.api.nvim_buf_set_option(self.bufnr, "relativenumber", false)
-      ---@diagnostic disable-next-line
-      vim.api.nvim_buf_set_option(self.bufnr, "number", true)
-    end
+    ---@diagnostic disable-next-line
+    vim.api.nvim_buf_set_option(self.bufnr, "relativenumber", false)
+    ---@diagnostic disable-next-line
+    vim.api.nvim_buf_set_option(self.bufnr, "number", true)
   end)
 end
 
@@ -94,7 +99,6 @@ end
 
 ---@return vim.api.keyset.win_config config
 function HarpoonFloat:get_window_config()
-  print("anchor_winnr", self.anchor_winnr)
   local win_width = vim.api.nvim_win_get_width(self.anchor_winnr)
   local win_height = vim.api.nvim_win_get_height(self.anchor_winnr)
 
@@ -103,10 +107,10 @@ function HarpoonFloat:get_window_config()
     title_pos = "left",
     win = self.anchor_winnr,
     relative = "win",
-    width = 40,
+    width = 35,
     height = math.max(1, #self.harpoon_lines),
-    row = 0.4 * win_height,
-    col = win_width * 0.7,
+    row = win_height / 2,
+    col = win_width / 2,
     style = "minimal",
     border = "rounded",
   }
@@ -125,11 +129,14 @@ function HarpoonFloat:draw()
     -- Only draw if there is a single non-floating window open.
     -- Exlcuding our own window as a precaution
     local open_wins = vim.tbl_filter(function(v)
-      return v == self.winnr or vim.api.nvim_win_get_config(v).relative == ''
+      -- Filter gives us the elements where this predicate is true
+      return v ~= self.winnr and vim.api.nvim_win_get_config(v).relative == ''
     end, vim.api.nvim_list_wins())
     if #open_wins == 1 then
       self:set_buffer_lines()
       self:create_window_if_not_exists()
+    else
+      print "NOT REDRAWING"
     end
   end)
 end
