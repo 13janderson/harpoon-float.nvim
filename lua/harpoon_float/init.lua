@@ -158,8 +158,7 @@ end
 
 -- Draw on being loaded
 vim.schedule(function()
-  local harpoon_float = require "harpoon-float.nvim"
-  local float = harpoon_float:new()
+  local float = HarpoonFloat:new()
   float:draw()
 end)
 
