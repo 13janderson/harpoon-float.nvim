@@ -9,8 +9,7 @@ local M = {}
 M.setup = function()
   local float = HarpoonFloat:new()
   float:update_buffer_lines()
-  float:create_window()
+  float:create_window_if_not_exists()
 end
-
 
 return M
