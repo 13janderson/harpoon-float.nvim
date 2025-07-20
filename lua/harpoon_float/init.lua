@@ -44,7 +44,6 @@ function HarpoonFloat:register_autocmds()
     group = vim.api.nvim_create_augroup('HarpoonFloatRedrawOnResize', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
-        print "RESIZING"
         self:draw()
       end
     end,
@@ -115,9 +114,6 @@ function HarpoonFloat:get_window_config()
     style = "minimal",
     border = "rounded",
   }
-  print(string.format("anchor_winnr: %d, win_width: %d, win_height: %d, row: %f, col: %f",
-    self.anchor_winnr, win_width, win_height, config.row, config.col))
-
   return config
 end
 
@@ -142,8 +138,6 @@ function HarpoonFloat:draw()
     if #open_wins == 1 then
       self:set_buffer_lines()
       self:create_window_if_not_exists()
-    else
-      print "NOT REDRAWING"
     end
   end)
 end
