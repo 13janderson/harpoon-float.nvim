@@ -156,4 +156,11 @@ function HarpoonFloat:close()
   end
 end
 
+-- Draw on being loaded
+vim.schedule(function()
+  local harpoon_float = require "harpoon-float.nvim"
+  local float = harpoon_float:new()
+  float:draw()
+end)
+
 return HarpoonFloat
