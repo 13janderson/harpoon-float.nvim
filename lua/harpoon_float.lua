@@ -13,10 +13,10 @@ function HarpoonFloat:new()
 
   harpoon:extend({
     LIST_CHANGE = function()
-      instance:redraw()
+      instance:draw()
     end,
     ADD = function()
-      instance:redraw()
+      instance:draw()
     end
   })
   return instance
@@ -29,7 +29,7 @@ function HarpoonFloat:register_autocmds()
     group = vim.api.nvim_create_augroup('HarpoonFloatRedraw', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
-        self:redraw()
+        self:draw()
       end
     end,
   })
@@ -117,7 +117,7 @@ function HarpoonFloat:get_window_config()
     title_pos = "center",
     win = self.anchor_winnr,
     relative = "win",
-    width = 39,
+    width = 40,
     height = #self.harpoon_lines,
     row = 0.4 * win_height,
     col = win_width * 0.7,
@@ -134,7 +134,7 @@ function HarpoonFloat:create_window_if_not_exists()
   self.winnr = vim.api.nvim_open_win(self.bufnr, false, self:get_window_config())
 end
 
-function HarpoonFloat:redraw()
+function HarpoonFloat:draw()
   vim.schedule(function()
     self:update_buffer_lines()
     self:update_window_config()
