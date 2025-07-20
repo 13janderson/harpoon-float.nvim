@@ -9,6 +9,8 @@ and thus this extension is only compatible with Harpoon2 and above.
 The floating window is not intended to be a **replacement** for the harpoon quick_menu, it is intended to complement it by displaying it's state while it does not appear.
 You thus still edit harpoon entries via the quick menu like before but have these constantly shown to you in a floating window.
 
+To make this distinction clear, the floating window is hidden once the harpoon menu is opened.
+
 Features:
 - The floating window is loaded on neovim startup, AFTER harpoon is loaded. 
 - Floating window is anchored to the current window and is resized when that window is resized.
