@@ -114,7 +114,7 @@ function HarpoonFloat:get_window_config()
   local win_height = vim.api.nvim_win_get_height(self.anchor_winnr)
   return {
     title = "HarpoonFloat",
-    title_pos = "center",
+    title_pos = "left",
     win = self.anchor_winnr,
     relative = "win",
     width = 40,
