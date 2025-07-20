@@ -16,6 +16,9 @@ function HarpoonFloat:new()
     end,
     ADD = function()
       instance:draw()
+    end,
+    UI_CREATE = function()
+      instance:hide()
     end
   })
 
@@ -122,6 +125,12 @@ function HarpoonFloat:close()
   end
   if vim.api.nvim_buf_is_valid(self.bufnr) then
     vim.api.nvim_buf_delete(self.bufnr, { force = true })
+  end
+end
+
+function HarpoonFloat:hide()
+  if vim.api.nvim_win_is_valid(self.winnr) then
+    vim.api.nvim_win_hide(self.winnr)
   end
 end
 
