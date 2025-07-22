@@ -105,7 +105,7 @@ function HarpoonFloat:get_window_config()
     width = 35,
     height = math.max(1, #self.harpoon_lines),
     row = win_height / 2,
-    col = win_width / 2,
+    col = win_width * 0.75,
     style = "minimal",
     border = "rounded",
   }
@@ -162,5 +162,7 @@ function HarpoonFloat:setup()
     float:draw()
   end)
 end
+
+HarpoonFloat:setup()
 
 return HarpoonFloat
