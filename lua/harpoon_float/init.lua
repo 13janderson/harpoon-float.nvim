@@ -8,6 +8,7 @@ function HarpoonFloat:new()
 
   local instance = setmetatable({}, self)
   instance.anchor_winnr = vim.api.nvim_get_current_win()
+  instance.is_hidden = false
   instance:register_autocmds()
 
   harpoon:extend({
@@ -29,7 +30,7 @@ function HarpoonFloat:new()
             end
           end)
         end,
-        once = true
+        once = true -- Need once = true since harpoon will use a new window every time
       })
     end
   })
@@ -58,13 +59,29 @@ function HarpoonFloat:register_autocmds()
       end
     end,
   })
+
+  vim.api.nvim_create_autocmd('WinClosed', {
+    desc = "Detect manual closing of our own window",
+    group = vim.api.nvim_create_augroup('HarpoonFloatClose', { clear = true }),
+    callback = function(e)
+      vim.schedule(function()
+        if tonumber(e.match) == self.winnr then 
+          -- Lucky for us this is only triggered when the user closes our window not when we hide it ourself
+          self.is_hidden = true
+        end
+        -- if tonumber(e.match) == harpoon.ui.win_id then
+        --   self:draw()
+        -- end
+      end)
+    end,
+    -- once = true
+  })
 end
 
 function HarpoonFloat:create_buffer_if_not_exists()
   if self.bufnr == nil or not vim.api.nvim_buf_is_valid(self.bufnr) then
     self.bufnr = vim.api.nvim_create_buf(false, true)
   end
-
 end
 
 -- Sets the buffer lines, creating the buffer if needed first.
@@ -125,6 +142,11 @@ function HarpoonFloat:create_window_if_not_exists()
 end
 
 function HarpoonFloat:draw()
+  -- Only draw ourselves if we are not hidden by user forcefully
+  if self.is_hidden then
+    return
+  end
+
   vim.schedule(function()
     -- Only draw if there is a single non-floating window open.
     -- Exlcuding our own window as a precaution
@@ -162,7 +184,5 @@ function HarpoonFloat:setup()
     float:draw()
   end)
 end
-
-HarpoonFloat:setup()
 
 return HarpoonFloat
