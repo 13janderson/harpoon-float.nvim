@@ -65,16 +65,12 @@ function HarpoonFloat:register_autocmds()
     group = vim.api.nvim_create_augroup('HarpoonFloatClose', { clear = true }),
     callback = function(e)
       vim.schedule(function()
-        if tonumber(e.match) == self.winnr then 
+        if tonumber(e.match) == self.winnr then
           -- Lucky for us this is only triggered when the user closes our window not when we hide it ourself
           self.is_hidden = true
         end
-        -- if tonumber(e.match) == harpoon.ui.win_id then
-        --   self:draw()
-        -- end
       end)
     end,
-    -- once = true
   })
 end
 
@@ -82,6 +78,16 @@ function HarpoonFloat:create_buffer_if_not_exists()
   if self.bufnr == nil or not vim.api.nvim_buf_is_valid(self.bufnr) then
     self.bufnr = vim.api.nvim_create_buf(false, true)
   end
+end
+
+-- Returns whether the harpoon list has any entries or not
+---@return boolean
+function HarpoonFloat:harpoon_has_entries()
+  local entries = list:display()
+  if #entries == 0 or (#entries == 1 and entries[1] == "") then
+    return false
+  end
+  return true
 end
 
 -- Sets the buffer lines, creating the buffer if needed first.
@@ -155,8 +161,10 @@ function HarpoonFloat:draw()
       return v ~= self.winnr and vim.api.nvim_win_get_config(v).relative == ''
     end, vim.api.nvim_list_wins())
     if #open_wins == 1 then
-      self:set_buffer_lines()
-      self:create_window_if_not_exists()
+      if self:harpoon_has_entries() then
+        self:set_buffer_lines()
+        self:create_window_if_not_exists()
+      end
     end
   end)
 end
@@ -172,7 +180,7 @@ function HarpoonFloat:close()
 end
 
 function HarpoonFloat:hide()
-  if vim.api.nvim_win_is_valid(self.winnr) then
+  if self.winnr ~= nil and vim.api.nvim_win_is_valid(self.winnr) then
     vim.api.nvim_win_hide(self.winnr)
   end
 end
