@@ -17,21 +17,6 @@ function HarpoonFloat:new()
     end,
     ADD = function()
       instance:draw()
-    end,
-    UI_CREATE = function()
-      instance:hide()
-      vim.api.nvim_create_autocmd('WinClosed', {
-        desc = "Redraw harpoon overlay on harpoon's own window being closed",
-        group = vim.api.nvim_create_augroup('HarpoonFloatRedrawWithHarpoonWinClose', { clear = true }),
-        callback = function(e)
-          vim.schedule(function()
-            if tonumber(e.match) == harpoon.ui.win_id then
-              self:draw()
-            end
-          end)
-        end,
-        once = true -- Need once = true since harpoon will use a new window every time
-      })
     end
   })
 
@@ -41,7 +26,7 @@ end
 function HarpoonFloat:register_autocmds()
   -- Resize the floating window on the anchoring window being resized
   vim.api.nvim_create_autocmd('WinResized', {
-    desc = 'Redraw harpoon overlay on resize',
+    desc = 'Redraw harpoon float on resize',
     group = vim.api.nvim_create_augroup('HarpoonFloatRedrawOnResize', { clear = true }),
     callback = function(e)
       if tonumber(e.match) == self.anchor_winnr then
@@ -51,7 +36,7 @@ function HarpoonFloat:register_autocmds()
   })
 
   vim.api.nvim_create_autocmd('WinNew', {
-    desc = 'Redraw harpoon overlay on resize',
+    desc = 'Hide harpoon float on another window being opened',
     group = vim.api.nvim_create_augroup('HarpoonFloatHideWithNewWindow', { clear = true }),
     callback = function(e)
       if tonumber(e.match) ~= self.winnr then
@@ -160,6 +145,7 @@ function HarpoonFloat:draw()
       -- Filter gives us the elements where this predicate is true
       return v ~= self.winnr and vim.api.nvim_win_get_config(v).relative == ''
     end, vim.api.nvim_list_wins())
+
     if #open_wins == 1 then
       if self:harpoon_has_entries() then
         self:set_buffer_lines()
