@@ -12,15 +12,17 @@ You thus still edit harpoon entries via the quick menu like before but have thes
 To make this distinction clear, the floating window is hidden once the harpoon menu is opened and then re-opened once the harpoon menu is closed.
 
 # Functionality
-- The floating window is loaded on neovim startup, AFTER harpoon is loaded. 
+- The floating window is loaded on neovim startup, **AFTER** harpoon is loaded. 
 - Floating window is anchored to the current window and is resized when that window is resized.
 - Updates to harpoon list are reflected in floating window by hooking into harpoon events.
 - Floating window is **NEVER** open at the same time as harpoon's menu window.
+- Floating window will not appear **EVER** again for the current session after the user forcefully closes it.
+- Floating window will not appear if there are no entries in the harpoon list, as to not waste screen space.
 
 
 # Installation
 
-# Lazy
+## Lazy
 
 ```lua
 {

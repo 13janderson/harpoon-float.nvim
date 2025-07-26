@@ -35,6 +35,7 @@ function HarpoonFloat:register_autocmds()
     end,
   })
 
+  -- Hide floating window upon another window being opened
   vim.api.nvim_create_autocmd('WinNew', {
     desc = 'Hide harpoon float on another window being opened',
     group = vim.api.nvim_create_augroup('HarpoonFloatHideWithNewWindow', { clear = true }),
@@ -45,6 +46,8 @@ function HarpoonFloat:register_autocmds()
     end,
   })
 
+  -- Mark floating window as hidden if it is ever manually closed by the user
+  -- This enforces the window to NEVER be opened again in this neovim instance
   vim.api.nvim_create_autocmd('WinClosed', {
     desc = "Detect manual closing of our own window",
     group = vim.api.nvim_create_augroup('HarpoonFloatClose', { clear = true }),
@@ -102,8 +105,11 @@ end
 
 ---@return vim.api.keyset.win_config config
 function HarpoonFloat:get_window_config()
+  if (not vim.api.nvim_win_is_valid(self.anchor_winnr)) then
+    self.anchor_winnr = vim.api.nvim_get_current_win()
+  end
+  
   local win_width = vim.api.nvim_win_get_width(self.anchor_winnr)
-  local win_height = vim.api.nvim_win_get_height(self.anchor_winnr)
 
   local config = {
     title = "HarpoonFloat",
@@ -112,8 +118,8 @@ function HarpoonFloat:get_window_config()
     relative = "win",
     width = 35,
     height = math.max(1, #self.harpoon_lines),
-    row = win_height / 2,
-    col = win_width * 0.75,
+    row = 0,
+    col = win_width * 0.6,
     style = "minimal",
     border = "rounded",
   }
@@ -178,5 +184,8 @@ function HarpoonFloat:setup()
     float:draw()
   end)
 end
+
+local float = HarpoonFloat:new()
+float:draw()
 
 return HarpoonFloat
