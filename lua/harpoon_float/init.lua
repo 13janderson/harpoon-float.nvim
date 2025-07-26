@@ -185,7 +185,4 @@ function HarpoonFloat:setup()
   end)
 end
 
-local float = HarpoonFloat:new()
-float:draw()
-
 return HarpoonFloat
