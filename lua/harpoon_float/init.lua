@@ -56,6 +56,9 @@ function HarpoonFloat:register_autocmds()
         if tonumber(e.match) == self.winnr then
           -- Lucky for us this is only triggered when the user closes our window not when we hide it ourself
           self.is_hidden = true
+        else
+          -- If a window is closed which is not our window, then we should try to draw again
+          self:draw()
         end
       end)
     end,
@@ -108,7 +111,7 @@ function HarpoonFloat:get_window_config()
   if (not vim.api.nvim_win_is_valid(self.anchor_winnr)) then
     self.anchor_winnr = vim.api.nvim_get_current_win()
   end
-  
+
   local win_width = vim.api.nvim_win_get_width(self.anchor_winnr)
 
   local config = {
