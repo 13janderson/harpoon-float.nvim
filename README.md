@@ -1,6 +1,4 @@
-# This has been moved my owndedicated fork of harpoon: [here](https://github.com/13janderson/harpoon2) 
-
-The 
+# This has been moved my own dedicated fork of harpoon: [here](https://github.com/13janderson/harpoon2) 
 
 # Motivation
 
